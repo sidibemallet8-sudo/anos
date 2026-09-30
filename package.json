@@ -1,0 +1,17 @@
+{
+  "name": "anos",
+  "version": "0.1.0",
+  "description": "ANOS - intelligent compression for AI models, projects, and documents.",
+  "main": "src/anos.js",
+  "bin": {
+    "anos": "src/cli.js"
+  },
+  "scripts": {
+    "start": "node src/cli.js",
+    "test": "node --test test/*.test.js"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18"
+  }
+}
