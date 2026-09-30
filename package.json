@@ -1,18 +1,59 @@
 {
   "name": "anos",
-  "version": "0.2.0",
-  "description": "ANOS - intelligent compression for AI models, projects, documents, and datasets.",
-  "main": "src/anos.js",
+  "version": "1.0.0-beta",
+  "description": "ANOS - Intelligent compression for AI, reducing carbon footprint and optimizing efficiency globally",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "bin": {
-    "anos": "src/cli.js"
+    "anos": "dist/cli.js"
   },
   "scripts": {
-    "start": "node src/cli.js",
-    "test": "node --test test/*.test.js",
-    "demo": "node examples/basic.js"
+    "build": "tsc --build tsconfig.json",
+    "test": "node --test dist/test/*.test.js",
+    "test:unit": "node --test dist/test/unit/*.test.js",
+    "test:integration": "node --test dist/test/integration/*.test.js",
+    "bench": "node dist/benchmarks/performance.js",
+    "start": "node dist/cli.js",
+    "demo": "node dist/examples/basic.js",
+    "dev": "tsc --watch",
+    "lint": "eslint src/**/*.ts",
+    "type-check": "tsc --noEmit",
+    "format": "prettier --write \"src/**/*.ts\"",
+    "prepublishOnly": "npm run build && npm test"
   },
+  "keywords": [
+    "compression",
+    "ai",
+    "ml",
+    "model",
+    "pytorch",
+    "tensorflow",
+    "carbon",
+    "sustainability",
+    "efficiency",
+    "quantization",
+    "optimization"
+  ],
+  "author": "Malet Sidibe",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/sidibemallet8-sudo/anos.git"
+  },
   "engines": {
-    "node": ">=18"
+    "node": ">=18.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "eslint": "^8.0.0",
+    "prettier": "^3.0.0"
+  },
+  "dependencies": {
+    "commander": "^11.0.0",
+    "chalk": "^5.0.0",
+    "progress": "^2.0.3",
+    "pino": "^8.0.0",
+    "crypto-js": "^4.2.0"
   }
 }
