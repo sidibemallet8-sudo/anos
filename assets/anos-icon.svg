@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ICON_PATH="$SCRIPT_DIR/../assets/anos-icon.svg"
+DESKTOP_FILE="$HOME/.local/share/applications/anos.desktop"
+
+mkdir -p "$HOME/.local/share/applications"
+cat > "$DESKTOP_FILE" <<EOF
+[Desktop Entry]
+Type=Application
+Name=ANOS Archive
+Comment=Compression intelligente pour IA, projets et données
+Exec=xdg-open %f
+Icon=$ICON_PATH
+Terminal=false
+MimeType=application/x-anos;
+Categories=Utility;Development;
+EOF
+
+mkdir -p "$HOME/.local/share/mime/packages"
+cat > "$HOME/.local/share/mime/packages/anos.xml" <<EOF
+<?xml version="1.0"?>
+<mime-info xmlns='http://www.freedesktop.org/standards/shared-mime-info'>
+  <mime-type type="application/x-anos">
+    <comment>ANOS archive</comment>
+    <glob pattern="*.anos"/>
+  </mime-type>
+</mime-info>
+EOF
+
+update-mime-database "$HOME/.local/share/mime" || true
+update-desktop-database "$HOME/.local/share/applications" || true
+
+echo "ANOS file association installed for Linux."
+echo "Icon: $ICON_PATH"
+EOF

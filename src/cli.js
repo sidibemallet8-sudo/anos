@@ -1,61 +1,60 @@
-#!/usr/bin/env node
+function analyzeOptimization({ mime = 'generic', fileSize = 0, level = 'balanced' }) {
+  const lowerMime = String(mime).toLowerCase();
 
-const { writeArchive, extractArchive, infoArchive } = require('./anos');
-const path = require('node:path');
-const fs = require('node:fs');
-
-function printUsage() {
-  console.log(`ANOS CLI\n\nUsage:\n  anos compress <path> [output.anos]\n  anos extract <archive.anos> [output-dir]\n  anos info <archive.anos>\n`);
-}
-
-function main() {
-  const [, , command, ...args] = process.argv;
-
-  if (!command || command === '--help' || command === '-h') {
-    printUsage();
-    return;
+  if (lowerMime.includes('ai-model') || lowerMime.includes('model') || lowerMime.includes('tensor')) {
+    const recommendedAlgorithm = level === 'aggressive' ? 'gzip' : 'deflateRaw';
+    return {
+      aiOptimized: true,
+      recommendation: 'Model-aware compression + quantization recommended',
+      recommendedAlgorithm,
+      compressionPotential: 'high'
+    };
   }
 
-  try {
-    switch (command) {
-      case 'compress': {
-        const sourcePath = path.resolve(args[0]);
-        const outPath = args[1] ? path.resolve(args[1]) : undefined;
-        if (!sourcePath) {
-          throw new Error('Source path is required.');
-        }
-        const archivePath = writeArchive(sourcePath, outPath);
-        console.log(`Compressed successfully: ${archivePath}`);
-        break;
-      }
-
-      case 'extract': {
-        const archivePath = path.resolve(args[0]);
-        const targetDir = args[1] ? path.resolve(args[1]) : path.join(path.dirname(archivePath), 'extracted');
-        if (!archivePath) {
-          throw new Error('Archive path is required.');
-        }
-        const manifest = extractArchive(archivePath, targetDir);
-        console.log(`Extracted successfully to: ${targetDir}`);
-        console.log(`Files: ${manifest.files.length}`);
-        break;
-      }
-
-      case 'info': {
-        const archivePath = path.resolve(args[0]);
-        const info = infoArchive(archivePath);
-        console.log(JSON.stringify(info, null, 2));
-        break;
-      }
-
-      default:
-        printUsage();
-        break;
-    }
-  } catch (error) {
-    console.error(`ANOS error: ${error.message}`);
-    process.exitCode = 1;
+  if (lowerMime.includes('dataset') || lowerMime.includes('csv') || lowerMime.includes('json')) {
+    return {
+      aiOptimized: true,
+      recommendation: 'Use deduplication and columnar-friendly compression',
+      recommendedAlgorithm: level === 'aggressive' ? 'gzip' : 'deflateRaw',
+      compressionPotential: 'high'
+    };
   }
+
+  if (lowerMime.includes('archive') || lowerMime.includes('binary')) {
+    return {
+      aiOptimized: true,
+      recommendation: 'Apply binary-aware compression and verification',
+      recommendedAlgorithm: 'gzip',
+      compressionPotential: 'medium'
+    };
+  }
+
+  if (lowerMime.includes('code') || lowerMime.includes('markdown') || lowerMime.includes('text')) {
+    return {
+      aiOptimized: true,
+      recommendation: 'Remove redundancies and compress text structure',
+      recommendedAlgorithm: 'gzip',
+      compressionPotential: 'medium'
+    };
+  }
+
+  if (fileSize > 50 * 1024 * 1024) {
+    return {
+      aiOptimized: true,
+      recommendation: 'Large payload detected: prefer gzip for transfer efficiency',
+      recommendedAlgorithm: 'gzip',
+      compressionPotential: 'high'
+    };
+  }
+
+  return {
+    aiOptimized: true,
+    recommendation: 'Balanced AI-assisted compression selected',
+    recommendedAlgorithm: level === 'fast' ? 'deflateRaw' : 'gzip',
+    compressionPotential: 'medium'
+  };
 }
 
-main();
+module.exports = {
+  analyzeOptimization
+};
